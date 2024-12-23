@@ -1364,7 +1364,6 @@ acs_binded <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015, acs201
 
 ### Removing unnecessary dataframes
 
-rm("acs_2010", "acs_2011", "acs_2012", "acs_2013", "acs_2014", "acs_2015", "acs_2016", 
-   "acs_2017", "acs_2018", "acs_2019", "acs_2021", "acs_2022", "acs_2023")
+rm(list = ls()[grepl("acs20", ls())])
 
    
