@@ -17,7 +17,7 @@ census_api_key("794708f156e5f9a870d2531bb80e777690f72326", install = TRUE)
 
 acs2010 <- get_acs(survey = "acs1",
                    year = 2010,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -119,7 +119,7 @@ acs2010 <- get_acs(survey = "acs1",
 
 acs2011 <- get_acs(survey = "acs1",
                    year = 2011,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -221,7 +221,7 @@ acs2011 <- get_acs(survey = "acs1",
 
 acs2012 <- get_acs(survey = "acs1",
                    year = 2012,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -323,7 +323,7 @@ acs2012 <- get_acs(survey = "acs1",
 
 acs2013 <- get_acs(survey = "acs1",
                    year = 2013,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -425,7 +425,7 @@ acs2013 <- get_acs(survey = "acs1",
 
 acs2014 <- get_acs(survey = "acs1",
                    year = 2014,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -527,7 +527,7 @@ acs2014 <- get_acs(survey = "acs1",
 
 acs2015 <- get_acs(survey = "acs1",
                    year = 2015,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -629,7 +629,7 @@ acs2015 <- get_acs(survey = "acs1",
 
 acs2016 <- get_acs(survey = "acs1",
                    year = 2016,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -731,7 +731,7 @@ acs2016 <- get_acs(survey = "acs1",
 
 acs2017 <- get_acs(survey = "acs1",
                    year = 2017,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -833,7 +833,7 @@ acs2017 <- get_acs(survey = "acs1",
 
 acs2018 <- get_acs(survey = "acs1",
                    year = 2018,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -935,7 +935,7 @@ acs2018 <- get_acs(survey = "acs1",
 
 acs2019 <- get_acs(survey = "acs1",
                    year = 2019,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -1037,7 +1037,7 @@ acs2019 <- get_acs(survey = "acs1",
 
 acs2021 <- get_acs(survey = "acs1",
                    year = 2021,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -1139,7 +1139,7 @@ acs2021 <- get_acs(survey = "acs1",
 
 acs2022 <- get_acs(survey = "acs1",
                    year = 2022,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -1241,7 +1241,7 @@ acs2022 <- get_acs(survey = "acs1",
 
 acs2023 <- get_acs(survey = "acs1",
                    year = 2023,
-                   geography = "county",
+                   geography = "place",
                    variables = c(
                      # gini
                      gini = "B19083_001",
@@ -1341,7 +1341,7 @@ acs2023 <- get_acs(survey = "acs1",
 
 ### Binding ACS Data Together 
 
-acs_binded_counties <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015, acs2016,
+acs_binded_cities <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015, acs2016,
                     acs2017, acs2018, acs2019, acs2021, acs2022, acs2023) |> 
   mutate(geoid = sub("^0+", "", geoid)) |> # getting rid of leading zero
   rename(statecounty_fips = geoid) |> 
@@ -1365,5 +1365,3 @@ acs_binded_counties <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs201
 ### Removing unnecessary dataframes
 
 rm(list = ls()[grepl("acs20", ls())])
-
-   
