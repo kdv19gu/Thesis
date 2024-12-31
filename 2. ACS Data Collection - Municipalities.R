@@ -11,7 +11,66 @@ library(jsonlite)
 
 census_api_key("794708f156e5f9a870d2531bb80e777690f72326", install = TRUE)
 
-### Loeading Census Bureau data
+### Creating filter for municipalities with different minimum wages
+
+municipalities <- c(
+  "Alameda city, California",
+  "Albuquerque city, New Mexico",
+  "Bellingham city, Washington",
+  "Belmont city, California",
+  "Berkeley city, California",
+  "Boulder city, Colorado",
+  "Burien city, Washington",
+  "Burlingame city, California",
+  "Chicago city, Illinois",
+  "Cupertino city, California",
+  "Daly City city, California",
+  "East Palo Alto city, California",
+  "Edgewater city, Colorado",
+  "Emeryville city, California",
+  "Everett city, Washington",
+  "Flagstaff city, Arizona",
+  "Foster City city, California",
+  "Freemont city, California",
+  "Half Moon Bay city, California",
+  "Hayward city, California",
+  "Las Cruces city, New Mexico",
+  "Los Angeles city, California",
+  "Malibu city, California",
+  "Menlo Park city, California",
+  "Milpitas city, California",
+  "Minneaplois city, Minnesota",
+  "Mountain View city, California",
+  "Novato city, California",
+  "Oakland city, California",
+  "Palo Alto city, California",
+  "Pasadena city, California",
+  "Petaluma city, California",
+  "Portland city, Maine",
+  "Redwood City city, California",
+  "Renton city, Washington",
+  "Richmond city, California",
+  "Rockland city, Maine",
+  "Saint Paul city, Minnesota",
+  "San Carlos city, California",
+  "San Diego city, California",
+  "San Francisco city, California",
+  "San Jose city, California",
+  "San Leandro city, California",
+  "San Mateo city, California",
+  "Santa Fe city, New Mexico",
+  "Santa Monica city, California",
+  "Santa Rosa city, California",
+  "Seattle city, Washington",
+  "Sonoma city, California",
+  "South San Francisco city, California",
+  "Sunnyvale city, California",
+  "Tucson city, Arizona",
+  "Tukwila city, Washington",
+  "West Hollywood city, California"
+)
+
+### Loading Census Bureau data
 
 # 2010 
 
@@ -1343,10 +1402,8 @@ acs2023 <- get_acs(survey = "acs1",
 
 acs_binded_cities <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015, acs2016,
                     acs2017, acs2018, acs2019, acs2021, acs2022, acs2023) |> 
-  mutate(geoid = sub("^0+", "", geoid)) |> # getting rid of leading zero
-  rename(statecounty_fips = geoid) |> 
-  mutate(statecounty_fips = as.numeric(statecounty_fips), # converting vars to numeric for consistency with stata
-         prop_less_than_hs = as.numeric(prop_less_than_hs),
+  rename(statecountycity_fips = geoid) |> 
+  mutate(prop_less_than_hs = as.numeric(prop_less_than_hs),
          prop_hs_grad = as.numeric(prop_hs_grad),
          prop_some_college_associates = as.numeric(prop_some_college_associates),
          prop_bachelors_higher = as.numeric(prop_bachelors_higher),
@@ -1360,8 +1417,20 @@ acs_binded_cities <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015,
          prop_hispanic = as.numeric(prop_hispanic),
          unemployment_rate = as.numeric(unemployment_rate),
          prop_foreign_born = as.numeric(prop_foreign_born),
-         prop_foreign_born_undocumented = as.numeric(prop_foreign_born_undocumented))
+         prop_foreign_born_undocumented = as.numeric(prop_foreign_born_undocumented),
+         statecounty_fips = substr(statecountycity_fips, 1, 5))|> 
+  select(statecounty_fips, everything())
 
 ### Removing unnecessary dataframes
 
 rm(list = ls()[grepl("acs20", ls())])
+
+### Add later
+
+mutate(statecountycity_fips = sub("^0+", "", statecountycity_fips),
+       statecounty_fips = sub("^0+", "", statecounty_fips),
+       statecountycity_fips = as.numeric(statecountycity_fips),
+       statecounty_fips = as.numeric(statecounty_fips))
+
+acs_binded_cities_filtered <- acs_binded_cities |> 
+  filter(name %in% municipalities)

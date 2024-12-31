@@ -1343,10 +1343,8 @@ acs2023 <- get_acs(survey = "acs1",
 
 acs_binded_counties <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015, acs2016,
                     acs2017, acs2018, acs2019, acs2021, acs2022, acs2023) |> 
-  mutate(geoid = sub("^0+", "", geoid)) |> # getting rid of leading zero
   rename(statecounty_fips = geoid) |> 
-  mutate(statecounty_fips = as.numeric(statecounty_fips), # converting vars to numeric for consistency with stata
-         prop_less_than_hs = as.numeric(prop_less_than_hs),
+  mutate(prop_less_than_hs = as.numeric(prop_less_than_hs),
          prop_hs_grad = as.numeric(prop_hs_grad),
          prop_some_college_associates = as.numeric(prop_some_college_associates),
          prop_bachelors_higher = as.numeric(prop_bachelors_higher),
@@ -1365,5 +1363,12 @@ acs_binded_counties <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs201
 ### Removing unnecessary dataframes
 
 rm(list = ls()[grepl("acs20", ls())])
+
+### Add later
+
+  rename(statecounty_fips = geoid) |> 
+  mutate(statecounty_fips = sub("^0+", "", statecounty_fips),
+         statecounty_fips = as.numeric(statecounty_fips))
+       
 
    
