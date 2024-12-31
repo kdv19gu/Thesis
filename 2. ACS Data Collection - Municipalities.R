@@ -625,7 +625,7 @@ acs2015 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -727,7 +727,7 @@ acs2016 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -829,7 +829,7 @@ acs2017 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -931,7 +931,7 @@ acs2018 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -1033,7 +1033,7 @@ acs2019 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -1135,7 +1135,7 @@ acs2021 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -1237,7 +1237,7 @@ acs2022 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -1339,7 +1339,7 @@ acs2023 <- get_acs(survey = "acs1",
                      # immigration
                      countforeignborn = "B05002_013", 
                      countforeignborncitizen = "B05002_014",
-                     countforeignbornnotcitizen= "B05002_015")) |> 
+                     countforeignbornnotcitizen= "B05002_021")) |> 
   select(!moe) |> 
   pivot_wider(names_from = variable,
               values_from = estimate) |> 
@@ -1425,12 +1425,6 @@ acs_binded_cities <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015,
 
 rm(list = ls()[grepl("acs20", ls())])
 
-### Add later
+### Saving dataframe
 
-mutate(statecountycity_fips = sub("^0+", "", statecountycity_fips),
-       statecounty_fips = sub("^0+", "", statecounty_fips),
-       statecountycity_fips = as.numeric(statecountycity_fips),
-       statecounty_fips = as.numeric(statecounty_fips))
-
-acs_binded_cities_filtered <- acs_binded_cities |> 
-  filter(name %in% municipalities)
+save.image(here("Processed/city_acs.RData"))
