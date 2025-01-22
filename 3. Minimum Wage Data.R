@@ -63,7 +63,7 @@ acs_binded_counties <- acs_binded_counties |>
          year = as.numeric(year)) |> 
   select(state_fips, everything())
 
-counties_acs_minwage <- acs_binded_counties |> 
+county_acs_minwage <- acs_binded_counties |> 
   left_join(state_minwage_panel |> 
               select(state_fips, year, minwage), 
             by = c("state_fips", "year")) |> 
@@ -77,10 +77,12 @@ counties_acs_minwage <- acs_binded_counties |>
 
 # Implementing lagged variables and higher-than-fed indicator var
 
-counties_acs_minwage <- counties_acs_minwage |> 
+county_acs_minwage <- county_acs_minwage |> 
   group_by(statecounty_fips) |> 
   arrange(year) |> 
   mutate(minwage_over_fed = if_else(prevailing_minwage > 7.25, 1, 0),
+         minwage_over_state = if_else(prevailing_minwage > state_minwage, 1, 0),
+         prevailing_minwage_diff = prevailing_minwage - lag(prevailing_minwage),
          minwage_lag1 = lag(prevailing_minwage),
          minwage_lag2 = lag(prevailing_minwage, 2),
          minwage_lag3 = lag(prevailing_minwage, 3)) |> 
@@ -109,63 +111,50 @@ city_minwage_panel <- city_minwage |>
                names_to = "year",
                values_to = "minwage")
 
+# Adding city minwage data to ACS data
+
+acs_binded_cities_minwage <- acs_binded_cities |> 
+  mutate(year = as.numeric(year)) |> 
+  left_join(city_minwage_panel |> 
+              select(statecountycity_fips, year, minwage) |> 
+              mutate(year = as.numeric(year)),
+            by = c("statecountycity_fips", "year")) |> 
+  rename(city_minwage = minwage)
+
+# Adding state minwage data to cities missing proprietary minwage for cities
+
+acs_binded_cities_minwage <- acs_binded_cities_minwage |> 
+  left_join(state_minwage_panel |> 
+              select(state_fips, year, minwage),
+            by = c("state_fips", "year")) |> 
+  rename(state_minwage = minwage) |> 
+  mutate(minwage_2 = if_else(city_minwage > state_minwage, city_minwage, state_minwage),
+         minwage_2 = if_else(is.na(minwage_2), state_minwage, minwage_2),
+         prevailing_minwage = if_else(minwage_2 > state_minwage, minwage_2, state_minwage)) |> 
+  select(-minwage_2)
+
 # Calculating year-to-year difference and lagged minwage vars
 
-# think about doing these modifications once the entire panel dataset is completed........
-
-state_minwage_panel <- state_minwage_panel |> 
-  group_by(statefips) |> 
+city_acs_minwage <- acs_binded_cities_minwage |> 
+  group_by(statecountycity_fips) |> 
   arrange(year) |> 
-  mutate(minwage_over_fed = ifelse(minwage > 7.25, 1, 0),
-         # minwage_yearly_difference = minwage - lag(minwage), # add this one later
-         # minwage_change_indicator = ifelse(minwage_yearly_difference > 0, 1, 0), # add this one later
-         minwage_lag1 = lag(minwage),
-         minwage_lag2 = lag(minwage, 2),
-         minwage_lag3 = lag(minwage, 3)) |> 
+  mutate(minwage_over_fed = if_else(prevailing_minwage > 7.25, 1, 0),
+         minwage_over_state = if_else(prevailing_minwage > state_minwage, 1, 0),
+         prevailing_minwage_diff = prevailing_minwage - lag(prevailing_minwage),
+         minwage_lag1 = lag(prevailing_minwage),
+         minwage_lag2 = lag(prevailing_minwage, 2),
+         minwage_lag3 = lag(prevailing_minwage, 3)) |> 
   ungroup()
 
+### Removing uneccesary dataframes
+
+rm(list = setdiff(ls(), c("county_acs_minwage", "city_acs_minwage")))
+
+### Saving dataframes
+
+save.image(here("Processed/city_county_acs_minwage.RData"))
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Add later
-
-rename(statecounty_fips = geoid) |> 
-  mutate(statecounty_fips = sub("^0+", "", statecounty_fips),
-         statecounty_fips = as.numeric(statecounty_fips))
-
-acs_binded_counties |> 
-  ggplot() +
-  geom_point(mapping = aes(x = year, y = prop_foreign_born_undocumented))
-
-#
-
-mutate(statecountycity_fips = sub("^0+", "", statecountycity_fips),
-       statecounty_fips = sub("^0+", "", statecounty_fips),
-       statecountycity_fips = as.numeric(statecountycity_fips),
-       statecounty_fips = as.numeric(statecounty_fips))
-
-acs_binded_cities_filtered <- acs_binded_cities |> 
-  filter(name %in% municipalities)
