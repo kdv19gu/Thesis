@@ -1418,8 +1418,9 @@ acs_binded_cities <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs2015,
          unemployment_rate = as.numeric(unemployment_rate),
          prop_foreign_born = as.numeric(prop_foreign_born),
          prop_foreign_born_undocumented = as.numeric(prop_foreign_born_undocumented),
-         statecounty_fips = substr(statecountycity_fips, 1, 5))|> 
-  select(statecounty_fips, everything())
+         statecounty_fips = substr(statecountycity_fips, 1, 5),
+         state_fips = substr(statecountycity_fips, 1, 2)) |> 
+  select(state_fips, statecounty_fips, everything())
 
 ### Removing unnecessary dataframes
 

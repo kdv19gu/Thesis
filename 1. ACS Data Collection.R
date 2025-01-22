@@ -1361,9 +1361,29 @@ acs_binded_counties <- rbind(acs2010, acs2011, acs2012, acs2013, acs2014, acs201
          prop_foreign_born = as.numeric(prop_foreign_born),
          prop_foreign_born_undocumented = as.numeric(prop_foreign_born_undocumented))
 
+### Implementing population density measures
+
+county_land_area <- read.csv("Supplemental Data/2023_Gaz_counties_national.txt",
+                             sep = "\t",
+                             header = TRUE) |> 
+  rename(statecounty_fips = GEOID,
+         land_sqmi = ALAND_SQMI) |> 
+  mutate(statecounty_fips = as.character(statecounty_fips),
+         statecounty_fips = if_else(
+    str_length(statecounty_fips) == 4,
+    str_pad(statecounty_fips, width = 5, side = "left", pad = "0"),
+    statecounty_fips))
+
+acs_binded_counties <- acs_binded_counties |> 
+  left_join(county_land_area |> 
+              select(statecounty_fips, land_sqmi),
+            by = "statecounty_fips") |> 
+  mutate(pop_density = total_population / land_sqmi)
+
 ### Removing unnecessary dataframes
 
 rm(list = ls()[grepl("acs20", ls())])
+rm(county_land_area)
 
 ### Saving dataframe
 
