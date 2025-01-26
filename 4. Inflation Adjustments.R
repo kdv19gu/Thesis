@@ -177,28 +177,41 @@ city_acs_adj_minwage <- city_acs_minwage |>
 
 rm(list = setdiff(ls(), c("county_acs_adj_minwage", "city_acs_adj_minwage")))
 
-### Downloading dataframes as STATA files
+### Final adjustments
 
-county_acs_adj_minwage |> 
+# County
+
+county_acs_adj_minwage <- county_acs_adj_minwage |> 
   mutate(state_fips = as.numeric(state_fips),
          statecounty_fips = as.numeric(statecounty_fips)) |> 
+  filter(state_fips != 72) # Removing Puerto Rico
+
+county_acs_adj_minwage %>%
+  select(-c(minwage_lag1, minwage_lag2, minwage_lag3, 
+            r_minwage_lag1, r_minwage_lag2, r_minwage_lag3)) %>%
+  summarise(across(everything(), ~ sum(is.na(.)), .names = "na_count_{.col}")) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_count") %>%
+  filter(na_count > 0)
+
+# City
+
+city_acs_adj_minwage <- city_acs_adj_minwage |> 
+  mutate(state_fips = as.numeric(state_fips),
+         statecounty_fips = as.numeric(statecounty_fips),
+         statecountycity_fips = as.numeric(statecountycity_fips)) |> 
+  filter(state_fips != 72) # Removing Puerto Rico
+
+city_acs_adj_minwage %>%
+  select(-c(minwage_lag1, minwage_lag2, minwage_lag3, 
+            r_minwage_lag1, r_minwage_lag2, r_minwage_lag3)) %>%
+  summarise(across(everything(), ~ sum(is.na(.)), .names = "na_count_{.col}")) %>%
+  pivot_longer(everything(), names_to = "column", values_to = "na_count") %>%
+  filter(na_count > 0)
+
+### Saving as STATA files
+
+county_acs_adj_minwage |> 
   write_dta("STATA Files/county_acs_adj_minwage.dta")
 
 city_acs_adj_minwage |> 
-  mutate(state_fips = as.numeric(state_fips),
-         statecounty_fips = as.numeric(statecounty_fips),
-         statecountycity_fips = as.numeric(statecountycity_fips)) |> 
   write_dta("STATA Files/city_acs_adj_minwage.dta")
-
-city_acs_adj_minwage |> 
-  filter(state_fips == "06") |> 
-  mutate(state_fips = as.numeric(state_fips),
-         statecounty_fips = as.numeric(statecounty_fips),
-         statecountycity_fips = as.numeric(statecountycity_fips)) |> 
-  write_dta("STATA Files/ca_city_acs_adj_minwage.dta")
-  
-  
-  
-  
-  
-
