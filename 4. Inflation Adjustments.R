@@ -113,7 +113,12 @@ county_acs_adj_minwage <- county_acs_minwage |>
   mutate(r_prevailing_minwage_diff = r_prevailing_minwage - lag(r_prevailing_minwage),
          r_minwage_lag1 = lag(r_prevailing_minwage),
          r_minwage_lag2 = lag(r_prevailing_minwage, 2),
-         r_minwage_lag3 = lag(r_prevailing_minwage, 3)) |> 
+         r_minwage_lag3 = lag(r_prevailing_minwage, 3),
+         minwage_change_indicator = case_when(
+           prevailing_minwage_diff == NA ~ 0,
+           prevailing_minwage_diff == 0 ~ 0,
+           prevailing_minwage_diff > 0 ~ 1),
+         minwage_change_interaction = minwage_change_indicator * prevailing_minwage_diff) |> 
   ungroup()
   
 ### Adjusting figures by inflation for city panel using 2010 as base
@@ -170,7 +175,12 @@ city_acs_adj_minwage <- city_acs_minwage |>
   mutate(r_prevailing_minwage_diff = r_prevailing_minwage - lag(r_prevailing_minwage),
          r_minwage_lag1 = lag(r_prevailing_minwage),
          r_minwage_lag2 = lag(r_prevailing_minwage, 2),
-         r_minwage_lag3 = lag(r_prevailing_minwage, 3)) |> 
+         r_minwage_lag3 = lag(r_prevailing_minwage, 3),
+         minwage_change_indicator = case_when(
+           prevailing_minwage_diff == NA ~ 0,
+           prevailing_minwage_diff == 0 ~ 0,
+           prevailing_minwage_diff > 0 ~ 1),
+         minwage_change_interaction = minwage_change_indicator * prevailing_minwage_diff) |> 
   ungroup()
 
 ### Removing unnecessary dataframes
@@ -206,7 +216,8 @@ city_acs_adj_minwage %>%
             r_minwage_lag1, r_minwage_lag2, r_minwage_lag3)) %>%
   summarise(across(everything(), ~ sum(is.na(.)), .names = "na_count_{.col}")) %>%
   pivot_longer(everything(), names_to = "column", values_to = "na_count") %>%
-  filter(na_count > 0)
+  filter(na_count > 0) |> 
+  view()
 
 ### Saving as STATA files
 
